@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
     'apps.productos',
     'apps.ventas',
     'apps.cliente',
-
 ]
 
 REST_FRAMEWORK = {
@@ -54,16 +55,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-
-DJOSER = {
-    'USER_ID_FIELD': 'username',  # Puedes cambiar esto a 'id' o 'email' si usas otra estrategia
-    'LOGIN_FIELD': 'email',  # Si usas email como campo de login
-    'SERIALIZERS': {    
-        'user_create': 'djoser.serializers.UserCreateSerializer',
-        'user': 'djoser.serializers.UserSerializer',
-        'current_user': 'djoser.serializers.UserSerializer',
-    },
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
