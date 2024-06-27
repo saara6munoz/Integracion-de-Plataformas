@@ -40,9 +40,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'apps.productos',
-    'apps.ventas',
+    'apps.carro',
     'apps.cliente',
+    'apps.delivery',
+    'apps.factura',
+    'apps.inventario',
+    'apps.pago',
+    'apps.producto',
+    'apps.venta',    
 ]
 
 REST_FRAMEWORK = {

@@ -1,8 +1,11 @@
 from django.db import models
-from ventas.models import Carrito
+from apps.venta.models import Venta
 
 class Delivery(models.Model):
-    carrito = models.OneToOneField(Carrito, on_delete=models.CASCADE)
-    fecha_delivery = models.DateTimeField(auto_now_add=True)
-    metodo_pago = models.CharField(max_length=100, default='Efectivo')  
-    total = models.DecimalField(max_digits=10, decimal_places=2)
+    venta = models.ForeignKey(Venta, on_delete=models.CASCADE)
+    direccion_envio = models.CharField(max_length=255)
+    fecha_envio = models.DateTimeField()
+    estado = models.CharField(max_length=50, choices=[('Pendiente', 'Pendiente'), ('Enviado', 'Enviado'), ('Entregado', 'Entregado')])
+
+    def __str__(self):
+        return f"Delivery {self.id} - Venta {self.venta.id}"
