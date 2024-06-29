@@ -11,6 +11,7 @@ class CarroViewSet(viewsets.ModelViewSet):
     queryset = Carro.objects.all()
     serializer_class = CarroSerializer
 
+# Renombrando la instancia 'Carro' a 'carro' en la vista agregar_producto_al_carro
 @api_view(['POST'])
 def agregar_producto_al_carro(request):
     try:
@@ -21,15 +22,15 @@ def agregar_producto_al_carro(request):
 
         if request.user.is_authenticated:
             usuario = request.user
-            Carro, creado = Carro.objects.get_or_create(usuario=usuario)
+            carro, creado = Carro.objects.get_or_create(usuario=usuario)
         else:
             session_key = request.session.session_key
             if not session_key:
                 request.session.create()
                 session_key = request.session.session_key
-            Carro, creado = Carro.objects.get_or_create(session_key=session_key)
+            carro, creado = Carro.objects.get_or_create(session_key=session_key)
 
-        item, created = CarroProducto.objects.get_or_create(Carro=Carro, producto=producto)
+        item, created = CarroProducto.objects.get_or_create(carro=carro, producto=producto)
         if not created:
             item.cantidad += cantidad
             item.save()
@@ -37,28 +38,29 @@ def agregar_producto_al_carro(request):
             item.cantidad = cantidad
             item.save()
 
-        mensaje = f'El producto {producto.nombre} se ha añadido al Carro correctamente'
+        mensaje = f'El producto {producto.nombre} se ha añadido al carro correctamente'
         return Response({'mensaje': mensaje}, status=status.HTTP_200_OK)
     except Producto.DoesNotExist:
         return Response({'error': 'El producto especificado no existe'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# Similar cambio en la vista obtener_carro
 @api_view(['GET'])
 def obtener_carro(request):
     try:
         if request.user.is_authenticated:
-            Carro = Carro.objects.filter(usuario=request.user, pagado=False).first()
+            carro = Carro.objects.filter(usuario=request.user, pagado=False).first()
         else:
             if not request.session.session_key:
                 request.session.create()
             session_key = request.session.session_key
-            Carro = Carro.objects.filter(session_key=session_key, pagado=False).first()
+            carro = Carro.objects.filter(session_key=session_key, pagado=False).first()
 
-        if not Carro:
+        if not carro:
             return Response({'carro_id': None, 'productos': [], 'total': 0}, status=status.HTTP_200_OK)
 
-        carro_productos = CarroProducto.objects.filter(carro=Carro).select_related('producto')
+        carro_productos = CarroProducto.objects.filter(carro=carro).select_related('producto')
 
         productos = []
         total = 0
@@ -74,7 +76,7 @@ def obtener_carro(request):
             total += producto.precio * item.cantidad
 
         response_data = {
-            'carro_id': Carro.id,
+            'carro_id': carro.id,
             'productos': productos,
             'total': float(total)
         }

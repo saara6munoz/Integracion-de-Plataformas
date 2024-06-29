@@ -19,5 +19,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('ventas/', include('apps.venta.urls')),
     path('clientes/', include('apps.cliente.urls')),
+    path('carro/agregar/', carro_views.agregar_producto_al_carro, name='agregar-producto-al-carro'),
+    path('carro/obtener/', carro_views.obtener_carro, name='obtener-carro'),
+    path('carro/eliminar/<int:producto_id>/', carro_views.eliminar_producto_del_carro, name='eliminar-producto-del-carro'),
+    path('ventas/pagar/', ventas_views.pagar_carro, name='pagar-carro')
 ]
 
