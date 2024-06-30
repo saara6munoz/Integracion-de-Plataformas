@@ -80,9 +80,10 @@ def test_pago_carro_inexistente():
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert 'Carro no encontrado o ya pagado' in response.data['error']
 
+
 @pytest.mark.django_db
 def test_venta_serializacion():
-    # Crear un carro de prueba
+    # Crear un usuario y un carro de prueba
     user = User.objects.create_user(username='testuser', password='testpassword')
     carro = Carro.objects.create(usuario=user)
 
@@ -91,8 +92,12 @@ def test_venta_serializacion():
 
     # Serializar la venta y verificar los datos
     serializer = VentaSerializer(instance=venta)
-    assert serializer.data['carro']['id'] == carro.id
+    
+    # Verifica que los datos serializados incluyan el campo 'carro' como un ID
+    assert 'carro' in serializer.data
+    assert serializer.data['carro'] == carro.id  # Compara directamente con el ID del carro
     assert serializer.data['metodo_pago'] == 'tarjeta'
     assert serializer.data['total'] == '200.00'
+
 
 

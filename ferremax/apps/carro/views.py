@@ -11,7 +11,6 @@ class CarroViewSet(viewsets.ModelViewSet):
     queryset = Carro.objects.all()
     serializer_class = CarroSerializer
 
-# Renombrando la instancia 'Carro' a 'carro' en la vista agregar_producto_al_carro
 @api_view(['POST'])
 def agregar_producto_al_carro(request):
     try:
@@ -30,13 +29,17 @@ def agregar_producto_al_carro(request):
                 session_key = request.session.session_key
             carro, creado = Carro.objects.get_or_create(session_key=session_key)
 
-        item, created = CarroProducto.objects.get_or_create(carro=carro, producto=producto)
-        if not created:
-            item.cantidad += cantidad
-            item.save()
+        # Intenta obtener el CarroProducto existente para el producto
+        carro_producto, creado = CarroProducto.objects.get_or_create(carro=carro, producto=producto)
+
+        # Si el producto ya existe en el carro, actualiza la cantidad
+        if not creado:
+            carro_producto.cantidad += cantidad
+            carro_producto.save()
         else:
-            item.cantidad = cantidad
-            item.save()
+            # Si es nuevo, simplemente asigna la cantidad proporcionada
+            carro_producto.cantidad = cantidad
+            carro_producto.save()
 
         mensaje = f'El producto {producto.nombre} se ha añadido al carro correctamente'
         return Response({'mensaje': mensaje}, status=status.HTTP_200_OK)

@@ -6,8 +6,20 @@ from .models import Venta
 from apps.producto.models import Producto
 from apps.carro.models import Carro, CarroProducto
 from .serializer import VentaSerializer
+from rest_framework import viewsets
 
+class VentaViewSet(viewsets.ModelViewSet):
+    queryset = Venta.objects.all()
+    serializer_class = VentaSerializer
 
+    def create(self, request):
+        serializer = VentaSerializer(data=request.data)
+        if serializer.is_valid():
+            venta = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 @api_view(['POST'])
 def pagar_carro(request):
     try:

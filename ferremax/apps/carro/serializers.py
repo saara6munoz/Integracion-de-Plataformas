@@ -34,3 +34,26 @@ class CarroSerializer(serializers.ModelSerializer):
         productos = CarroProducto.objects.filter(carro=instance)
         representation['productos'] = CarroProductoSerializer(productos, many=True).data
         return representation
+
+    def update(self, instance, validated_data):
+        productos_data = validated_data.pop('carroproducto_set', None)
+        instance.usuario = validated_data.get('usuario', instance.usuario)
+        instance.save()
+
+        if productos_data is not None:
+            # Crear un diccionario de los productos existentes en el carrito
+            existing_productos = {cp.producto.id: cp for cp in instance.carroproducto_set.all()}
+            
+            for producto_data in productos_data:
+                producto = producto_data.get('producto')
+                cantidad = producto_data.get('cantidad', 1)
+
+                if producto.id in existing_productos:
+                    # Actualizar la cantidad si el producto ya está en el carrito
+                    existing_productos[producto.id].cantidad += cantidad
+                    existing_productos[producto.id].save()
+                else:
+                    # Crear un nuevo CarroProducto si el producto no está en el carrito
+                    CarroProducto.objects.create(carro=instance, producto=producto, cantidad=cantidad)
+
+        return instance
