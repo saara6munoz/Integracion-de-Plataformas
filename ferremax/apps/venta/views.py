@@ -19,6 +19,8 @@ class VentaViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        
     
 @api_view(['POST'])
 def pagar_carro(request):
@@ -73,3 +75,20 @@ def pagar_carro(request):
 
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def obtener_detalle_venta(request, pk):
+    try:
+        venta = Venta.objects.get(pk=pk)
+    except Venta.DoesNotExist:
+        return Response({'error': 'Venta no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Aquí decides cómo quieres serializar el carro
+    if request.query_params.get('simple', False):
+        # Si se especifica 'simple=true' en los parámetros de consulta, devuelve solo el ID del carro
+        carro_id = venta.carro.id
+        return Response({'carro_id': carro_id}, status=status.HTTP_200_OK)
+    else:
+        # De lo contrario, devuelve el objeto serializado completo
+        serializer = VentaSerializer(venta)
+        return Response(serializer.data, status=status.HTTP_200_OK)
